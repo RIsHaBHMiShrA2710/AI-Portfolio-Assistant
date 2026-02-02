@@ -1,0 +1,50 @@
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Environment files - NEVER commit these!
+.env
+.env.local
+.env.*.local
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Uploaded files (user-specific data)
+Tools/*.pdf
+uploads/
+
+# Database files
+*.db
+*.sqlite3
+
+# Analysis output files (regenerated)
+portfolio_analysis_*.json
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Misc
+*.egg-info/
+dist/
+build/

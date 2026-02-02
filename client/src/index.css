@@ -1,0 +1,91 @@
+/* 
+ * PortfolioAI - Global Styles
+ * Theme: Deep Ocean + Neon Accents
+ */
+
+:root {
+  /* Primary Colors - Deep Ocean */
+  --bg-primary: #0a0f1a;
+  --bg-secondary: #111827;
+  --bg-card: #1a2235;
+  --bg-card-hover: #1f2a3f;
+
+  /* Accent Colors - Neon */
+  --accent-primary: #00d4ff;
+  --accent-secondary: #7c3aed;
+  --accent-gradient: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+
+  /* Success/Danger */
+  --success: #00ff88;
+  --danger: #ff4d6a;
+
+  /* Text Colors */
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* Borders */
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-glow: rgba(0, 212, 255, 0.3);
+
+  /* Font */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-primary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-secondary);
+}
+
+a {
+  color: var(--accent-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-secondary);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}

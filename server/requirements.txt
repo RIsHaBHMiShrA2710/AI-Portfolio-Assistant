@@ -1,0 +1,16 @@
+fastapi[standard]
+langchain
+langchain-groq
+langchain-community
+pypdf
+python-dotenv
+pydantic
+requests
+bs4
+typing
+yfinance
+curl_cffi
+sqlalchemy
+psycopg2-binary
+python-multipart
+aiofiles
