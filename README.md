@@ -2,7 +2,7 @@
 
 An AI-powered portfolio analyzer that extracts data from demat holdings PDFs, fetches real-time stock prices, calculates P&L, and provides an intelligent chatbot for investment insights.
 
-## IMPORTANT TO NOTE ##: #This app currently has been tested with portfolio holding's pdf which you can download from your respective brokers. In future, I would like to add feature to parse multiple types of documents or directly connection with broker through api.# 
+## IMPORTANT TO NOTE: This app currently has been tested with portfolio holding's pdf which you can download from your respective brokers. In future, I would like to add feature to parse multiple types of documents or directly connection with broker through api. ##
 
 ## Features
 
