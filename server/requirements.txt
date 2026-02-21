@@ -2,6 +2,7 @@ fastapi[standard]
 langchain
 langchain-groq
 langchain-community
+langgraph
 pypdf
 python-dotenv
 pydantic
