@@ -4,12 +4,19 @@ Enhanced tools for stock analysis, portfolio insights, and market data.
 """
 from langchain.tools import tool
 import yfinance as yf
-from langchain_community.tools.yahoo_finance_news import YahooFinanceNewsTool
+from langchain_community.tools import DuckDuckGoSearchRun
 import json
 import numpy as np
 from typing import Optional
+import finnhub
+import os
+from dotenv import load_dotenv
+from datetime import datetime, timedelta
+import requests
 
-_news_tool = YahooFinanceNewsTool()
+load_dotenv()
+
+GNEWS_KEY = os.getenv("GNEWS_API_KEY")
 
 @tool
 def get_company_profile(ticker: str) -> str:
@@ -20,6 +27,7 @@ def get_company_profile(ticker: str) -> str:
     Args:
         ticker: NSE stock ticker (e.g., 'RELIANCE', 'TCS', 'INFY')
     """
+    print(f"Fetching company profile for {ticker}...")  # Debug statement
     try:
         symbol = f"{ticker.upper().replace('.NS', '')}.NS"
         stock = yf.Ticker(symbol)
@@ -51,6 +59,7 @@ def get_key_financial_metrics(ticker: str) -> str:
     Args:
         ticker: NSE stock ticker (e.g., 'RELIANCE', 'TCS')
     """
+    print(f"Fetching financial metrics for {ticker}...")  # Debug statement
     try:
         symbol = f"{ticker.upper().replace('.NS', '')}.NS"
         stock = yf.Ticker(symbol)
@@ -80,6 +89,8 @@ def get_technical_analysis(ticker: str) -> str:
     Args:
         ticker: NSE stock ticker (e.g., 'HAL', 'IRFC')
     """
+    print(f"Fetching technical analysis for {ticker}...")  # Debug statement
+
     try:
         symbol = f"{ticker.upper().replace('.NS', '')}.NS"
         hist = yf.Ticker(symbol).history(period="1y")
@@ -134,6 +145,7 @@ def calculate_risk_metrics(ticker: str) -> str:
     Args:
         ticker: NSE stock ticker (e.g., 'RELIANCE', 'TCS')
     """
+    print(f"Calculating risk metrics for {ticker}...")  # Debug statement
     try:
         symbol = f"{ticker.upper().replace('.NS', '')}.NS"
         
@@ -181,21 +193,60 @@ def calculate_risk_metrics(ticker: str) -> str:
     except Exception as e:
         return json.dumps({"error": str(e)})
 
+INDIAN_SOURCES = {
+    "Economic Times",
+    "Moneycontrol",
+    "Business Standard",
+    "Livemint",
+    "Reuters India",
+    "CNBC TV18",
+    "Hindu BusinessLine"
+}
+
 @tool
-def get_stock_news(ticker: str) -> str:
+def get_stock_news(ticker: str, limit: int = 8) -> list:
     """
-    Get latest news for a stock ticker.
-    Use this when user asks about news, updates, or recent developments.
-    
+    Fetch recent India-focused news for a stock.
+
+    Searches Indian business news from the last months and returns the most
+    relevant articles with date, headline, summary, and source.
+
+    Use for queries about recent developments, earnings, corporate actions,
+    or major events affecting a stock.
+
     Args:
-        ticker: Stock ticker (e.g., 'RELIANCE', 'TCS', 'HAL')
+        ticker (str): Stock ticker or company name (e.g., 'RELIANCE', 'TCS').
+        limit (int): Number of articles to return (default 8).
+
+    Returns:
+        List of dicts: {date, headline, summary, source}.
     """
     try:
-        result = _news_tool.run(ticker.upper())
-        return result if result else f"No recent news found for {ticker}"
-    except Exception as e:
-        return f"Unable to fetch news: {str(e)}"
+        url = "https://gnews.io/api/v4/search"
 
+        params = {
+            "q": ticker,
+            "country": "in",
+            "lang": "en",
+            "max": limit,
+            "apikey": GNEWS_KEY
+        }
+
+        r = requests.get(url, params=params).json()
+
+        results = []
+        for article in r.get("articles", []):
+            results.append({
+                "date": article["publishedAt"][:10],
+                "headline": article["title"],
+                "summary": article["description"],
+                "source": article["source"]["name"]
+            })
+
+        return results
+
+    except Exception as e:
+        return [{"error": str(e)}]
 
 @tool
 def compare_stocks(ticker1: str, ticker2: str) -> str:
@@ -207,6 +258,7 @@ def compare_stocks(ticker1: str, ticker2: str) -> str:
         ticker1: First stock ticker (e.g., 'IRFC')
         ticker2: Second stock ticker (e.g., 'IREDA')
     """
+    print(f"Comparing {ticker1} and {ticker2}...")  # Debug statement
     try:
         def get_metrics(ticker: str):
             symbol = f"{ticker.upper().replace('.NS', '')}.NS"
@@ -246,6 +298,7 @@ def get_current_price(ticker: str) -> str:
     Args:
         ticker: NSE stock ticker (e.g., 'HAL', 'IRFC', 'RELIANCE')
     """
+    print(f"Fetching current price for {ticker}...")  # Debug statement
     try:
         symbol = f"{ticker.upper().replace('.NS', '')}.NS"
         stock = yf.Ticker(symbol)
@@ -268,10 +321,10 @@ def get_current_price(ticker: str) -> str:
 
 ALL_FINANCE_TOOLS = [
     get_company_profile, ## working
-    get_key_financial_metrics, ##working
-    get_technical_analysis, ##working
-    calculate_risk_metrics,
-    get_stock_news, ## notworking
-    compare_stocks,
-    get_current_price
+    get_key_financial_metrics, ## working
+    get_technical_analysis, ## working
+    calculate_risk_metrics,## working 
+    get_stock_news, ## working
+    compare_stocks,## working 
+    get_current_price ## working 
 ]
