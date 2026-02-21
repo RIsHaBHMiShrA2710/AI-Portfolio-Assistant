@@ -7,6 +7,7 @@ import glob
 
 def _get_latest_portfolio() -> Optional[Dict]:
     """Load the most recent portfolio JSON file."""
+    print("Loading latest portfolio data...")  # Debug statement
     portfolio_dir = Path(__file__).parent.parent
     files = list(portfolio_dir.glob("portfolio_analysis_*.json"))
     
@@ -25,6 +26,7 @@ def get_portfolio_summary() -> str:
     Get overall portfolio summary: total investment, current value, P&L, and key stats.
     Use this when user asks about portfolio overview, total value, or overall performance.
     """
+    print("Executing get_portfolio_summary tool...")  # Debug statement
     try:
         portfolio = _get_latest_portfolio()
         if not portfolio:
@@ -70,6 +72,7 @@ def get_holding_details(stock_name: str) -> str:
     Args:
         stock_name: Stock name or ticker (e.g., 'HAL', 'HINDUSTAN AERONAUTICS', 'IRFC')
     """
+    print(f"Executing get_holding_details tool for stock_name: {stock_name}")  # Debug statement
     try:
         portfolio = _get_latest_portfolio()
         if not portfolio:
@@ -114,6 +117,7 @@ def get_sector_allocation() -> str:
     Get portfolio breakdown by sector with allocation percentages.
     Use this when user asks about diversification or sector exposure.
     """
+    print("Executing get_sector_allocation tool...")  # Debug statement
     try:
         portfolio = _get_latest_portfolio()
         if not portfolio:
@@ -130,7 +134,6 @@ def get_sector_allocation() -> str:
                 sectors[sector] = {"value": 0, "stocks": []}
             sectors[sector]["value"] += current_value
             sectors[sector]["stocks"].append(h.get('ticker_symbol', 'N/A'))
-        t
         allocation = []
         for sector, data in sectors.items():
             pct = (data["value"] / total_value * 100) if total_value > 0 else 0
@@ -157,6 +160,7 @@ def get_stocks_in_profit() -> str:
     Get list of all stocks currently in profit.
     Use this when user asks which stocks are doing well or are profitable.
     """
+    print("Executing get_stocks_in_profit tool...")
     try:
         portfolio = _get_latest_portfolio()
         if not portfolio:
@@ -189,6 +193,7 @@ def get_stocks_in_loss() -> str:
     Get list of all stocks currently in loss.
     Use this when user asks which stocks are losing money or underperforming.
     """
+    print("Executing get_stocks_in_loss tool...")  # Debug statement
     try:
         portfolio = _get_latest_portfolio()
         if not portfolio:
@@ -221,6 +226,7 @@ def get_largest_holdings() -> str:
     Get the largest holdings by current value.
     Use this when user asks about biggest positions or where most money is invested.
     """
+    print("Executing get_largest_holdings tool...")
     try:
         portfolio = _get_latest_portfolio()
         if not portfolio:
@@ -253,7 +259,7 @@ def get_largest_holdings() -> str:
 ALL_PORTFOLIO_TOOLS = [
     get_portfolio_summary, ## working
     get_holding_details, ## working
-    get_sector_allocation, ## Not working currently
+    get_sector_allocation, ## Working
     get_stocks_in_profit, ## working
     get_stocks_in_loss, ## working
     get_largest_holdings ## working
