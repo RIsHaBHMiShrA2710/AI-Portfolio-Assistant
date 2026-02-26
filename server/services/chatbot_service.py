@@ -35,6 +35,9 @@ class PortfolioChatbot:
             - Format numbers in Indian style (₹ and lakhs/crores)
             - If portfolio data shows 0% P&L, it may be due to market being closed
 
+            RELEVANT PAST CONTEXT:
+            {rag_context}
+
             RECENT CONVERSATION:
             {chat_history}
         """
@@ -68,11 +71,15 @@ class PortfolioChatbot:
     
     def chat(self, user_message: str, session_id: Optional[str] = None) -> Dict[str, Any]:
         session_id = memory_manager.get_or_create_session(session_id)
-        chat_history = memory_manager.get_history_for_context(session_id, last_n=10)
+        chat_history = memory_manager.get_history_for_context(session_id, last_n=6)
         portfolio_context = self._get_portfolio_context()
-
+        
+        rag_chunks = memory_manager.retrieve_similar(session_id, user_message, top_k=5)
+        rag_context = "\n\n".join(rag_chunks) if rag_chunks else "No relevant past context."
+        print(f"RAG chunks retrieved: {len(rag_chunks)}")
         formatted_system = self.system_prompt.format(
             portfolio_context=portfolio_context,
+            rag_context=rag_context,
             chat_history=chat_history or "No previous conversation."
         )
 
@@ -91,9 +98,14 @@ class PortfolioChatbot:
             
             memory_manager.add_message(session_id, "user", user_message)
             memory_manager.add_message(session_id, "assistant", final_response)
+            try:
+                memory_manager.store_embedding(session_id, f"User: {user_message}\nAssistant: {final_response}")
+                print(f"✅ Embedding stored for session: {session_id}")
+            except Exception as embed_err:
+                print(f"❌ store_embedding failed: {embed_err}")
             
             return {
-                "response": final_response,
+                "response": final_response, 
                 "session_id": session_id,
                 "success": True
             }
