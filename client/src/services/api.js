@@ -44,6 +44,63 @@ export const sendMessage = async (message, sessionId = null) => {
     return response.data;
 };
 
+/**
+ * Stream a chat message via SSE, receiving real-time tool-call events.
+ * @param {string} message - User's message
+ * @param {string|null} sessionId - Current session ID
+ * @param {function} onToolCall - Callback invoked with tool name string when a tool is used
+ * @param {function} onComplete - Callback invoked with (response, toolsUsed, sessionId) when done
+ * @param {function} onError - Callback invoked with error message on failure
+ */
+export const sendMessageStream = async (message, sessionId, onToolCall, onComplete, onError) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/chat/stream`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message, session_id: sessionId }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error: ${response.status}`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop(); // Keep incomplete last line in buffer
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed.startsWith('data: ')) continue;
+
+                try {
+                    const payload = JSON.parse(trimmed.slice(6));
+
+                    if (payload.event === 'tool') {
+                        onToolCall(payload.tool_name);
+                    } else if (payload.event === 'done') {
+                        onComplete(payload.response, payload.tools_used || [], payload.session_id);
+                    } else if (payload.event === 'error') {
+                        onError(payload.response);
+                    }
+                } catch (parseErr) {
+                    console.warn('SSE parse error:', parseErr);
+                }
+            }
+        }
+    } catch (err) {
+        console.error('Stream request failed:', err);
+        onError('Connection error. Please try again.');
+    }
+};
+
 export const getSessions = async () => {
     const response = await api.get('/chat/sessions');
     return response.data;

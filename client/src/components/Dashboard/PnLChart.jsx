@@ -59,7 +59,7 @@ export default function PnLChart({ holdings = [] }) {
                         {pnlData.map((entry, index) => (
                             <Cell
                                 key={`cell-${index}`}
-                                fill={entry.pnl >= 0 ? '#10b981' : '#ef4444'}
+                                fill={entry.pnl >= 0 ? '#2E8B57' : '#D32F2F'}
                             />
                         ))}
                     </Bar>

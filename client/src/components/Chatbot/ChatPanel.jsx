@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, Plus, Trash2, Loader2, MessageSquare } from 'lucide-react';
+import { Send, Plus, Trash2, Loader2, MessageSquare, Wrench, Zap } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { sendMessage, getSessions, createSession, getSessionMessages, deleteSession } from '../../services/api';
+import remarkGfm from 'remark-gfm';
+import { sendMessageStream, getSessions, createSession, getSessionMessages, deleteSession } from '../../services/api';
 import './ChatPanel.css';
 
 export default function ChatPanel() {
@@ -11,6 +12,7 @@ export default function ChatPanel() {
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showSidebar, setShowSidebar] = useState(false);
+    const [activeTools, setActiveTools] = useState([]);
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
@@ -21,7 +23,7 @@ export default function ChatPanel() {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-    }, [messages]);
+    }, [messages, activeTools]);
 
     const loadSessions = async () => {
         try {
@@ -76,22 +78,47 @@ export default function ChatPanel() {
         setInputValue('');
         setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
         setIsLoading(true);
+        setActiveTools([]);
 
         try {
-            const response = await sendMessage(userMessage, currentSession);
-
-            if (!currentSession) {
-                setCurrentSession(response.session_id);
-                loadSessions();
-            }
-
-            setMessages(prev => [...prev, { role: 'assistant', content: response.response }]);
+            await sendMessageStream(
+                userMessage,
+                currentSession,
+                // onToolCall
+                (toolName) => {
+                    setActiveTools(prev => [...prev, toolName]);
+                },
+                // onComplete
+                (response, toolsUsed, sessionId) => {
+                    if (!currentSession) {
+                        setCurrentSession(sessionId);
+                        loadSessions();
+                    }
+                    setMessages(prev => [...prev, {
+                        role: 'assistant',
+                        content: response,
+                        toolsUsed: toolsUsed,
+                        toolCount: toolsUsed.length
+                    }]);
+                    setActiveTools([]);
+                    setIsLoading(false);
+                },
+                // onError
+                (errorMsg) => {
+                    setMessages(prev => [...prev, {
+                        role: 'assistant',
+                        content: errorMsg || 'Sorry, I encountered an error. Please try again.'
+                    }]);
+                    setActiveTools([]);
+                    setIsLoading(false);
+                }
+            );
         } catch (error) {
             setMessages(prev => [...prev, {
                 role: 'assistant',
                 content: 'Sorry, I encountered an error. Please try again.'
             }]);
-        } finally {
+            setActiveTools([]);
             setIsLoading(false);
         }
     };
@@ -167,19 +194,42 @@ export default function ChatPanel() {
                         <div key={idx} className={`message ${msg.role}`}>
                             <div className="message-content">
                                 {msg.role === 'assistant' ? (
-                                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                                 ) : (
                                     msg.content
                                 )}
                             </div>
+                            {/* Tools summary badge */}
+                            {msg.role === 'assistant' && msg.toolCount > 0 && (
+                                <div className="tools-summary">
+                                    <Wrench />
+                                    {msg.toolCount} tool{msg.toolCount !== 1 ? 's' : ''} used
+                                </div>
+                            )}
                         </div>
                     ))
                 )}
+
+                {/* Live tool progress */}
                 {isLoading && (
                     <div className="message assistant">
-                        <div className="message-content loading">
-                            <Loader2 className="spinning" size={16} />
-                            Thinking...
+                        <div className="tool-progress">
+                            <div className="tool-progress-header">
+                                <Loader2 className="spinning" size={16} />
+                                {activeTools.length > 0
+                                    ? 'Using tools...'
+                                    : 'Thinking...'}
+                            </div>
+                            {activeTools.length > 0 && (
+                                <div className="tool-chips">
+                                    {activeTools.map((tool, idx) => (
+                                        <span key={idx} className="tool-chip">
+                                            <Zap className="chip-icon" />
+                                            {tool}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
