@@ -2,9 +2,10 @@ import os
 import shutil
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, AsyncGenerator
 import json
 from datetime import datetime
 
@@ -39,6 +40,8 @@ class ChatResponse(BaseModel):
     response: str
     session_id: str
     success: bool
+    tools_used: List[str] = []
+    tool_count: int = 0
 
 
 class ResetRequest(BaseModel):
@@ -112,7 +115,26 @@ async def chat_endpoint(request: ChatRequest):
     return ChatResponse(
         response=result["response"],
         session_id=result["session_id"],
-        success=result["success"]
+        success=result["success"],
+        tools_used=result.get("tools_used", []),
+        tool_count=result.get("tool_count", 0)
+    )
+
+
+@app.post("/chat/stream")
+async def chat_stream_endpoint(request: ChatRequest):
+    """Stream chat response with real-time tool-call events via SSE."""
+    if not request.message.strip():
+        raise HTTPException(status_code=400, detail="Message cannot be empty")
+    
+    return StreamingResponse(
+        chatbot.chat_stream(request.message, request.session_id),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        }
     )
 
 

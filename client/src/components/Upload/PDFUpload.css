@@ -5,24 +5,24 @@
 }
 
 .dropzone {
-  border: 2px dashed rgba(0, 212, 255, 0.4);
+  border: 2px dashed rgba(250, 129, 18, 0.4);
   border-radius: 16px;
   padding: 48px 24px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(250, 129, 18, 0.04) 0%, rgba(224, 107, 0, 0.04) 100%);
 }
 
 .dropzone:hover {
-  border-color: rgba(0, 212, 255, 0.8);
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+  border-color: rgba(250, 129, 18, 0.7);
+  background: linear-gradient(135deg, rgba(250, 129, 18, 0.08) 0%, rgba(224, 107, 0, 0.08) 100%);
   transform: translateY(-2px);
 }
 
 .dropzone.active {
   border-color: var(--accent-primary);
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.15) 100%);
+  background: linear-gradient(135deg, rgba(250, 129, 18, 0.12) 0%, rgba(224, 107, 0, 0.12) 100%);
   transform: scale(1.02);
 }
 
@@ -33,12 +33,12 @@
 
 .dropzone.success {
   border-color: var(--success);
-  background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(46, 139, 87, 0.08) 0%, rgba(60, 179, 113, 0.08) 100%);
 }
 
 .dropzone.error {
   border-color: var(--danger);
-  background: linear-gradient(135deg, rgba(255, 77, 106, 0.1) 0%, rgba(248, 113, 113, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(211, 47, 47, 0.08) 0%, rgba(229, 115, 115, 0.08) 100%);
 }
 
 .dropzone-content {

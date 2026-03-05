@@ -1,6 +1,6 @@
 /*
- * Dashboard Components - Dark Theme Styles
- * Matches the Deep Ocean + Neon Accents theme
+ * Dashboard Components - Warm Theme Styles
+ * Theme: Warm Cream & Orange
  */
 
 /* Summary Cards */
@@ -20,12 +20,14 @@
     align-items: center;
     gap: 14px;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(34, 34, 34, 0.04);
 }
 
 .summary-card:hover {
     background: var(--bg-card-hover);
     border-color: var(--border-glow);
     transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(250, 129, 18, 0.1);
 }
 
 .card-icon {
@@ -40,23 +42,23 @@
 }
 
 .card-icon.invested {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, #FA8112 0%, #E06B00 100%);
 }
 
 .card-icon.current {
-    background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
 }
 
 .card-icon.profit {
-    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    background: linear-gradient(135deg, #2E8B57 0%, #3CB371 100%);
 }
 
 .card-icon.loss {
-    background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+    background: linear-gradient(135deg, #D32F2F 0%, #E57373 100%);
 }
 
 .card-icon.holdings {
-    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    background: linear-gradient(135deg, #C2884E 0%, #A0522D 100%);
 }
 
 .card-content {
@@ -100,10 +102,12 @@
     border-radius: 12px;
     padding: 20px;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(34, 34, 34, 0.04);
 }
 
 .chart-card:hover {
     border-color: var(--border-glow);
+    box-shadow: 0 4px 16px rgba(250, 129, 18, 0.08);
 }
 
 .chart-card h3 {
@@ -164,7 +168,7 @@
     background: var(--bg-card);
     border-radius: 8px;
     padding: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 20px rgba(34, 34, 34, 0.12);
     border: 1px solid var(--border-color);
 }
 
@@ -201,6 +205,7 @@
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 20px;
+    box-shadow: 0 2px 8px rgba(34, 34, 34, 0.04);
 }
 
 .table-header {
@@ -223,7 +228,7 @@
     border-radius: 8px;
     font-size: 0.875rem;
     width: 200px;
-    background: var(--bg-secondary);
+    background: var(--bg-primary);
     color: var(--text-primary);
 }
 
@@ -234,6 +239,7 @@
 .search-input:focus {
     outline: none;
     border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(250, 129, 18, 0.1);
 }
 
 .table-wrapper {
