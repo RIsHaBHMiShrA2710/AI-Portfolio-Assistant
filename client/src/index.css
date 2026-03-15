@@ -1,32 +1,34 @@
 /* 
  * PortfolioAI - Global Styles
- * Theme: Deep Ocean + Neon Accents
+ * Theme: Warm Cream & Orange
  */
 
-:root {
-  /* Primary Colors - Deep Ocean */
-  --bg-primary: #0a0f1a;
-  --bg-secondary: #111827;
-  --bg-card: #1a2235;
-  --bg-card-hover: #1f2a3f;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-  /* Accent Colors - Neon */
-  --accent-primary: #00d4ff;
-  --accent-secondary: #7c3aed;
-  --accent-gradient: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+:root {
+  /* Primary Colors - Warm Cream */
+  --bg-primary: #FAF3E1;
+  --bg-secondary: #F5E7C6;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FFF8ED;
+
+  /* Accent Colors - Vibrant Orange */
+  --accent-primary: #FA8112;
+  --accent-secondary: #E06B00;
+  --accent-gradient: linear-gradient(135deg, #FA8112 0%, #E06B00 100%);
 
   /* Success/Danger */
-  --success: #00ff88;
-  --danger: #ff4d6a;
+  --success: #2E8B57;
+  --danger: #D32F2F;
 
   /* Text Colors */
-  --text-primary: #ffffff;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #222222;
+  --text-secondary: #555555;
+  --text-muted: #888888;
 
   /* Borders */
-  --border-color: rgba(255, 255, 255, 0.1);
-  --border-glow: rgba(0, 212, 255, 0.3);
+  --border-color: rgba(34, 34, 34, 0.1);
+  --border-glow: rgba(250, 129, 18, 0.3);
 
   /* Font */
   font-family: 'Inter', system-ui, -apple-system, sans-serif;

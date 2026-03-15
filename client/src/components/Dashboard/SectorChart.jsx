@@ -3,9 +3,9 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import './Dashboard.css';
 
 const COLORS = [
-    '#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899',
-    '#f43f5e', '#ef4444', '#f97316', '#eab308', '#84cc16',
-    '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
+    '#FA8112', '#E06B00', '#C2884E', '#A0522D', '#D97706',
+    '#F59E0B', '#B45309', '#92400E', '#78350F', '#D4A76A',
+    '#E8B960', '#C49A3C', '#8B6914', '#6D5A00', '#A67C52',
 ];
 
 export default function SectorChart({ holdings = [] }) {

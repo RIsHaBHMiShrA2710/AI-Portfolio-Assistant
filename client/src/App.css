@@ -1,6 +1,6 @@
 /*
  * PortfolioAI - App Layout Styles
- * Using position fixed for guaranteed viewport lock
+ * Theme: Warm Cream & Orange
  */
 
 /* Reset and base */
@@ -28,7 +28,7 @@
 .loader {
   width: 50px;
   height: 50px;
-  border: 3px solid var(--bg-card);
+  border: 3px solid var(--bg-secondary);
   border-top-color: var(--accent-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -54,8 +54,8 @@
   justify-content: center;
   background: var(--bg-primary);
   background-image:
-    radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 20% 80%, rgba(250, 129, 18, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(224, 107, 0, 0.06) 0%, transparent 50%);
 }
 
 .upload-container {
@@ -66,7 +66,7 @@
   text-align: center;
   max-width: 480px;
   width: 90%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 60px rgba(34, 34, 34, 0.1);
 }
 
 .upload-header {
@@ -125,7 +125,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
 }
@@ -161,8 +161,8 @@
 }
 
 .refresh-btn:hover {
-  background: rgba(0, 212, 255, 0.1);
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+  background: rgba(250, 129, 18, 0.1);
+  box-shadow: 0 0 20px rgba(250, 129, 18, 0.15);
 }
 
 /* Dashboard scrollable content */
@@ -197,37 +197,145 @@
 }
 
 /* =============================================
+   PANEL RESIZER (DESKTOP ONLY)
+   ============================================= */
+.panel-resizer {
+  width: 6px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+  transition: background 0.2s ease;
+}
+
+.panel-resizer:hover,
+.panel-resizer:active {
+  background: rgba(250, 129, 18, 0.12);
+}
+
+.resizer-handle {
+  width: 4px;
+  height: 40px;
+  border-radius: 2px;
+  background: var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.panel-resizer:hover .resizer-handle,
+.panel-resizer:active .resizer-handle {
+  background: var(--accent-primary);
+  height: 60px;
+  box-shadow: 0 0 8px rgba(250, 129, 18, 0.3);
+}
+
+/* =============================================
    CHAT PANEL (RIGHT)
    ============================================= */
 .chat-panel {
-  width: 400px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   border-left: 1px solid var(--border-color);
   overflow: hidden;
+}
+
+/* =============================================
+   MOBILE TAB BAR
+   ============================================= */
+.mobile-tab-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -4px 20px rgba(34, 34, 34, 0.08);
+}
+
+.mobile-tab-bar .tab-buttons {
+  display: flex;
+  height: 56px;
+}
+
+.mobile-tab-bar .tab-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.mobile-tab-bar .tab-btn.active {
+  color: var(--accent-primary);
+}
+
+.mobile-tab-bar .tab-btn.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 25%;
+  right: 25%;
+  height: 3px;
+  background: var(--accent-gradient);
+  border-radius: 0 0 4px 4px;
+}
+
+.mobile-tab-bar .tab-btn svg {
+  width: 22px;
+  height: 22px;
 }
 
 /* =============================================
    RESPONSIVE
    ============================================= */
 @media (max-width: 1100px) {
+  .mobile-tab-bar {
+    display: block;
+  }
+
+  .panel-resizer {
+    display: none;
+  }
+
   .main-layout {
     flex-direction: column;
+    padding-bottom: 56px;
   }
 
   .dashboard-panel {
-    flex: 1;
-    height: 55%;
+    display: none;
+    height: 100%;
+  }
+
+  .dashboard-panel.active-tab {
+    display: flex;
   }
 
   .chat-panel {
-    width: 100%;
-    height: 45%;
+    display: none;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 100%;
     border-left: none;
-    border-top: 1px solid var(--border-color);
+  }
+
+  .chat-panel.active-tab {
+    display: flex;
   }
 
   .charts-row {
