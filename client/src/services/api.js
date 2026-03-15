@@ -9,6 +9,20 @@ const api = axios.create({
     },
 });
 
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+// Auth APIs
+export const authGoogle = async (credential) => {
+    const response = await api.post('/auth/google', { credential });
+    return response.data;
+};
+
 // Portfolio APIs
 export const uploadPortfolio = async (file) => {
     const formData = new FormData();

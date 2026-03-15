@@ -17,3 +17,5 @@ python-multipart
 aiofiles
 sentence-transformers
 chromadb
+google-auth
+PyJWT

@@ -12,6 +12,7 @@ from datetime import datetime
 from services.parse_holdings import parse_holdings
 from services.chatbot_service import chatbot
 from services.memory_manager import memory_manager
+from auth import router as auth_router
 
 app = FastAPI(
     title="Portfolio Assistant API",
@@ -29,6 +30,8 @@ app.add_middleware(
 
 UPLOAD_DIR = Path(__file__).parent / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
+
+app.include_router(auth_router)
 
 
 class ChatRequest(BaseModel):
