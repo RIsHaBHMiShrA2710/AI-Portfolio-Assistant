@@ -47,15 +47,39 @@ def get_db():
     finally:
         db.close()
 
+class User(Base):
+    """User model."""
+    __tablename__ = "users"
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    email = Column(String(255), unique=True, index=True, nullable=False)
+    name = Column(String(255))
+    picture = Column(String(1024))
+    google_id = Column(String(255), unique=True, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    sessions = relationship("ChatSession", back_populates="user")
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "name": self.name,
+            "picture": self.picture,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
+
 class ChatSession(Base):
     """Chat session model."""
     __tablename__ = "chat_sessions"
     
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     title = Column(String(255), default="New Chat")
+    user_id = Column(String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
+    user = relationship("User", back_populates="sessions")
     messages = relationship("ChatMessage", back_populates="session", cascade="all, delete-orphan")
     
     def to_dict(self):
@@ -170,3 +194,31 @@ class ChatRepository:
             .all()
         )
         return list(reversed(messages))  
+
+class UserRepository:
+    """Repository for user operations."""
+    
+    def __init__(self, db_session):
+        self.db = db_session
+        
+    def get_user_by_email(self, email: str) -> Optional[User]:
+        return self.db.query(User).filter(User.email == email).first()
+        
+    def create_or_update_google_user(self, email: str, name: str, picture: str, google_id: str) -> User:
+        user = self.get_user_by_email(email)
+        if user:
+            user.name = name
+            user.picture = picture
+            user.google_id = google_id
+        else:
+            user = User(
+                email=email,
+                name=name,
+                picture=picture,
+                google_id=google_id
+            )
+            self.db.add(user)
+            
+        self.db.commit()
+        self.db.refresh(user)
+        return user

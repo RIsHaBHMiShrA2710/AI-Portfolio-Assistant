@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, Plus, Trash2, Loader2, MessageSquare, Wrench, Zap } from 'lucide-react';
+import { Send, Plus, Trash2, Loader2, MessageSquare, Wrench, Zap, LogOut } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { sendMessageStream, getSessions, createSession, getSessionMessages, deleteSession } from '../../services/api';
+import { GoogleLogin, googleLogout } from '@react-oauth/google';
+import { sendMessageStream, getSessions, createSession, getSessionMessages, deleteSession, authGoogle } from '../../services/api';
 import './ChatPanel.css';
 
 export default function ChatPanel() {
@@ -13,11 +14,49 @@ export default function ChatPanel() {
     const [isLoading, setIsLoading] = useState(false);
     const [showSidebar, setShowSidebar] = useState(false);
     const [activeTools, setActiveTools] = useState([]);
+
+    // Auth state
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState(null);
+    const [freeChatsUsed, setFreeChatsUsed] = useState(0);
+
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
         loadSessions();
+        const storedAuth = localStorage.getItem('isAuthenticated') === 'true';
+        setIsAuthenticated(storedAuth);
+        if (storedAuth) {
+            const userData = localStorage.getItem('user');
+            if (userData) setUser(JSON.parse(userData));
+        }
+        const usedChats = parseInt(localStorage.getItem('freeChatsUsed') || '0', 10);
+        setFreeChatsUsed(usedChats);
     }, []);
+
+    const handleLoginSuccess = async (credentialResponse) => {
+        try {
+            // Verify token with our backend
+            const data = await authGoogle(credentialResponse.credential);
+
+            setIsAuthenticated(true);
+            setUser(data.user);
+            localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('token', data.access_token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+        } catch (error) {
+            console.error('Login failed', error);
+        }
+    };
+
+    const handleLogout = () => {
+        googleLogout();
+        setIsAuthenticated(false);
+        setUser(null);
+        localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+    };
 
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -74,7 +113,18 @@ export default function ChatPanel() {
     const handleSendMessage = async () => {
         if (!inputValue.trim() || isLoading) return;
 
+        if (!isAuthenticated && freeChatsUsed >= 5) {
+            return; // Chat locked
+        }
+
         const userMessage = inputValue.trim();
+
+        if (!isAuthenticated) {
+            const newCount = freeChatsUsed + 1;
+            setFreeChatsUsed(newCount);
+            localStorage.setItem('freeChatsUsed', newCount.toString());
+        }
+
         setInputValue('');
         setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
         setIsLoading(true);
@@ -130,6 +180,8 @@ export default function ChatPanel() {
         }
     };
 
+    const isLocked = !isAuthenticated && freeChatsUsed >= 5;
+
     return (
         <div className="chat-container">
             {/* Header */}
@@ -138,9 +190,29 @@ export default function ChatPanel() {
                     <MessageSquare size={18} />
                 </button>
                 <h2>Portfolio Assistant</h2>
-                <button className="new-chat-btn" onClick={handleNewChat}>
-                    <Plus size={18} />
-                </button>
+                <div className="header-actions">
+                    {isAuthenticated ? (
+                        <div className="user-profile">
+                            <span className="user-name">{user?.name}</span>
+                            <button className="logout-btn" onClick={handleLogout} title="Sign Out">
+                                <LogOut size={16} />
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="auth-btn-container">
+                            <GoogleLogin
+                                onSuccess={handleLoginSuccess}
+                                onError={() => console.log('Login Failed')}
+                                shape="pill"
+                                size="small"
+                                text="signin"
+                            />
+                        </div>
+                    )}
+                    <button className="new-chat-btn" onClick={handleNewChat}>
+                        <Plus size={18} />
+                    </button>
+                </div>
             </div>
 
             {/* Sidebar */}
@@ -237,21 +309,36 @@ export default function ChatPanel() {
             </div>
 
             {/* Input */}
-            <div className="chat-input">
-                <textarea
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Ask about your portfolio..."
-                    rows={1}
-                />
-                <button
-                    className="send-btn"
-                    onClick={handleSendMessage}
-                    disabled={!inputValue.trim() || isLoading}
-                >
-                    <Send size={18} />
-                </button>
+            <div className={`chat-input-wrapper ${isLocked ? 'locked' : ''}`}>
+                {isLocked && (
+                    <div className="locked-overlay">
+                        <div className="locked-content">
+                            <h3>Free Limit Reached</h3>
+                            <p>You've used your 5 free messages. Sign in to continue chatting.</p>
+                            <GoogleLogin
+                                onSuccess={handleLoginSuccess}
+                                onError={() => console.log('Login Failed')}
+                            />
+                        </div>
+                    </div>
+                )}
+                <div className="chat-input">
+                    <textarea
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder={isLocked ? "Sign in to continue..." : `Ask about your portfolio... ${!isAuthenticated ? `(${5 - freeChatsUsed} free left)` : ''}`}
+                        rows={1}
+                        disabled={isLocked || isLoading}
+                    />
+                    <button
+                        className="send-btn"
+                        onClick={handleSendMessage}
+                        disabled={!inputValue.trim() || isLoading || isLocked}
+                    >
+                        <Send size={18} />
+                    </button>
+                </div>
             </div>
         </div>
     );
